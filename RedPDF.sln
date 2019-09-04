@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2050
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadDoc", "ReadDoc\ReadDoc.csproj", "{1F59A074-4BB3-4616-825D-93D38D2E7833}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F59A074-4BB3-4616-825D-93D38D2E7833}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F59A074-4BB3-4616-825D-93D38D2E7833}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F59A074-4BB3-4616-825D-93D38D2E7833}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F59A074-4BB3-4616-825D-93D38D2E7833}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {455E00B3-7076-4D9C-B24D-B61F4E84DE10}
+	EndGlobalSection
+EndGlobal
