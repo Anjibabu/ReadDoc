@@ -217,146 +217,148 @@ namespace ReadDoc
         private int ExtractColorData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
 
-            WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true);
-            Body body = wordDocument.MainDocumentPart.Document.Body;
-            if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
+            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
             {
-                pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
-            }
-            int i = 1;
-
-            StringBuilder pageContentBuilder = new StringBuilder();
-            foreach (OpenXmlElement element in body.ChildElements)
-            {
-
-                if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
+                Body body = wordDocument.MainDocumentPart.Document.Body;
+                if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
                 {
-                    //pageContentBuilder.Append(element.InnerText );
-                    string result = DataExtractUtilities.GetTagData(element.InnerText);
-                    var isMatchColor = DataExtractUtilities.IsMatchColor(element, "green");
-                    if (isMatchColor)
-                        lstResult.Items.Add("Green Color Text --> " + result);
+                    pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
+                }
+                int i = 1;
 
-                    if (i > 1)
+                StringBuilder pageContentBuilder = new StringBuilder();
+                foreach (OpenXmlElement element in body.ChildElements)
+                {
+
+                    if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
                     {
-                        if (!string.IsNullOrWhiteSpace(result.Trim()) && isMatchColor)
+                        //pageContentBuilder.Append(element.InnerText );
+                        string result = DataExtractUtilities.GetTagData(element.InnerText);
+                        var isMatchColor = DataExtractUtilities.IsMatchColor(element, "green");
+                        if (isMatchColor)
+                            lstResult.Items.Add("Green Color Text --> " + result);
+
+                        if (i > 1)
                         {
-                            //  Console.WriteLine(element.InnerText);
-                            nTexts.Add(element.InnerText);
+                            if (!string.IsNullOrWhiteSpace(result.Trim()) && isMatchColor)
+                            {
+                                //  Console.WriteLine(element.InnerText);
+                                nTexts.Add(element.InnerText);
+                            }
                         }
                     }
+                    else
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                        i++;
+                        pageContentBuilder = new StringBuilder();
+                    }
+                    if (body.LastChild == element && pageContentBuilder.Length > 0)
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                    }
                 }
-                else
+
+                // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
+                foreach (var ntextItem in nTexts)
                 {
-                    pageviseContent.Add(i, pageContentBuilder.ToString());
-                    i++;
-                    pageContentBuilder = new StringBuilder();
-                }
-                if (body.LastChild == element && pageContentBuilder.Length > 0)
-                {
-                    pageviseContent.Add(i, pageContentBuilder.ToString());
+                    // Console.WriteLine(ntextItem);
+                    if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
+                    {
+                        lstResult.Items.Add(ntextItem);
+                    }
                 }
             }
-
-            // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
-            foreach (var ntextItem in nTexts)
-            {
-                // Console.WriteLine(ntextItem);
-                if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
-                {
-                    lstResult.Items.Add(ntextItem);
-                }
-            }
-
             return pageCount;
         }
 
         private int GetTextBySearch(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
             StringBuilder sb = new StringBuilder();
-            WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true);
-            Body body = wordDocument.MainDocumentPart.Document.Body;
-            if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
+            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
             {
-                pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
-                // Console.WriteLine("*** pageCount --> " + pageCount);
-            }
-            int i = 1;
-            int ifCount = 0;
-            StringBuilder pageContentBuilder = new StringBuilder();
-            foreach (OpenXmlElement element in body.ChildElements)
-            {
-                Console.WriteLine("***InnerText  --> " + element.InnerText);
-
-                String[] startCondition = new String[] { "[IF " };
-                String[] endCondition = new String[] { " END IF]" };
-                var isMatchCondition = DataExtractUtilities.IsMatchCondition(element, startCondition);
-                if (isMatchCondition)
+                Body body = wordDocument.MainDocumentPart.Document.Body;
+                if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
                 {
-                    ifCount++;
-                    sb.AppendFormat(startCondition + DataExtractUtilities.ExtractConditionText(element, startCondition));
-                    lstResult.Items.Add(startCondition[0].ToString() + DataExtractUtilities.ExtractConditionText(element, startCondition));
+                    pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
+                    // Console.WriteLine("*** pageCount --> " + pageCount);
                 }
-
-
-                var isMatchConditionEnd = DataExtractUtilities.IsMatchCondition(element, endCondition);
-                if (isMatchConditionEnd)
+                int i = 1;
+                int ifCount = 0;
+                StringBuilder pageContentBuilder = new StringBuilder();
+                foreach (OpenXmlElement element in body.ChildElements)
                 {
-                    sb.Append(DataExtractUtilities.ExtractEndConditionText(element, endCondition) + endCondition);
-                    ifCount = 0;
-                    lstResult.Items.Add(sb.ToString());
-                    //Console.WriteLine("*** 2. Condition Text --> " + element.InnerText);
-                }
-                //if (ifCount == 0)
-                //    Console.WriteLine("111 ***---- Text --> " + sb.ToString());
-                /*
-                if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
-                {
-                    //pageContentBuilder.Append(element.InnerText );
-                    string result =  element.InnerText;
-                    var isMatchCondition = DataExtractUtilities.IsMatchCondition(element, "[IF ");
-                     if (isMatchCondition)
-                    Console.WriteLine("*** 1. Condition Text --> " + result);
+                    Console.WriteLine("***InnerText  --> " + element.InnerText);
+
+                    String[] startCondition = new String[] { "[IF " };
+                    String[] endCondition = new String[] { " END IF]" };
+                    var isMatchCondition = DataExtractUtilities.IsMatchCondition(element, startCondition);
+                    if (isMatchCondition)
+                    {
+                        ifCount++;
+                        sb.AppendFormat(startCondition + DataExtractUtilities.ExtractConditionText(element, startCondition));
+                        lstResult.Items.Add(startCondition[0].ToString() + DataExtractUtilities.ExtractConditionText(element, startCondition));
+                    }
 
 
-                    var isMatchConditionEnd = DataExtractUtilities.IsMatchCondition(element, " END IF]");
+                    var isMatchConditionEnd = DataExtractUtilities.IsMatchCondition(element, endCondition);
                     if (isMatchConditionEnd)
                     {
-                        Console.WriteLine("*** 2. Condition Text --> " + element.InnerText);
+                        sb.Append(DataExtractUtilities.ExtractEndConditionText(element, endCondition) + endCondition);
+                        ifCount = 0;
+                        lstResult.Items.Add(sb.ToString());
+                        //Console.WriteLine("*** 2. Condition Text --> " + element.InnerText);
                     }
-
-                        if (i > 1)
+                    //if (ifCount == 0)
+                    //    Console.WriteLine("111 ***---- Text --> " + sb.ToString());
+                    /*
+                    if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
                     {
-                        if (!string.IsNullOrWhiteSpace(result.Trim()) && isMatchCondition)
+                        //pageContentBuilder.Append(element.InnerText );
+                        string result =  element.InnerText;
+                        var isMatchCondition = DataExtractUtilities.IsMatchCondition(element, "[IF ");
+                         if (isMatchCondition)
+                        Console.WriteLine("*** 1. Condition Text --> " + result);
+
+
+                        var isMatchConditionEnd = DataExtractUtilities.IsMatchCondition(element, " END IF]");
+                        if (isMatchConditionEnd)
                         {
-                            //  Console.WriteLine(element.InnerText);
-                            nTexts.Add(element.InnerText);
+                            Console.WriteLine("*** 2. Condition Text --> " + element.InnerText);
+                        }
+
+                            if (i > 1)
+                        {
+                            if (!string.IsNullOrWhiteSpace(result.Trim()) && isMatchCondition)
+                            {
+                                //  Console.WriteLine(element.InnerText);
+                                nTexts.Add(element.InnerText);
+                            }
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine("*** Page Number --> " + i);
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                        i++;
+                        pageContentBuilder = new StringBuilder();
+                    }
+                    if (body.LastChild == element && pageContentBuilder.Length > 0)
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                    }*/
                 }
-                else
-                {
-                    Console.WriteLine("*** Page Number --> " + i);
-                    pageviseContent.Add(i, pageContentBuilder.ToString());
-                    i++;
-                    pageContentBuilder = new StringBuilder();
-                }
-                if (body.LastChild == element && pageContentBuilder.Length > 0)
-                {
-                    pageviseContent.Add(i, pageContentBuilder.ToString());
-                }*/
-            }
 
-            // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
-            foreach (var ntextItem in nTexts)
-            {
-                // Console.WriteLine(ntextItem);
-                if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
+                // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
+                foreach (var ntextItem in nTexts)
                 {
-                    lstResult.Items.Add(ntextItem);
+                    // Console.WriteLine(ntextItem);
+                    if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
+                    {
+                        lstResult.Items.Add(ntextItem);
+                    }
                 }
             }
-
             return 0;
         }
 
