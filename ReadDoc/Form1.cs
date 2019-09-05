@@ -157,55 +157,58 @@ namespace ReadDoc
 
         private int ExtractTagsData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
-
-            WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true);
-            Body body = wordDocument.MainDocumentPart.Document.Body;
-            if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
+            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
             {
-                pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
-            }
-            int i = 1;
-
-            StringBuilder pageContentBuilder = new StringBuilder();
-            foreach (OpenXmlElement element in body.ChildElements)
-            {
-
-                if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
+                Body body = wordDocument.MainDocumentPart.Document.Body;
+                if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
                 {
-                    //pageContentBuilder.Append(element.InnerText );
-                    // string result = DataExtractUtilities.GetTagData(element.InnerText);
-                    string[] resultData = DataExtractUtilities.GetTagsListData(element);
+                    pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
+                }
+                int i = 1;
 
-                    nTexts.AddRange(resultData);
-                    //if (i > 1)
-                    //{
-                    //    if (!string.IsNullOrWhiteSpace(result.Trim()))
-                    //    {
-                    //        //  Console.WriteLine(element.InnerText);
-                    //        nTexts.Add(element.InnerText);
-                    //    }
-                    //}
-                }
-                else
+                StringBuilder pageContentBuilder = new StringBuilder();
+                foreach (OpenXmlElement element in body.ChildElements)
                 {
-                    pageviseContent.Add(i, pageContentBuilder.ToString());
-                    i++;
-                    pageContentBuilder = new StringBuilder();
-                }
-                if (body.LastChild == element && pageContentBuilder.Length > 0)
-                {
-                    pageviseContent.Add(i, pageContentBuilder.ToString());
-                }
-            }
 
-            // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
-            foreach (var ntextItem in nTexts)
-            {
-                // Console.WriteLine(ntextItem);
-                if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
-                {
-                    lstResult.Items.Add(ntextItem);
+                    if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        //pageContentBuilder.Append(element.InnerText );
+                        // string result = DataExtractUtilities.GetTagData(element.InnerText);
+                        List<string> rItems = new List<string>();
+                        string[] resultData = DataExtractUtilities.GetTagsListData(element, rItems);
+
+                        nTexts.AddRange(resultData);
+                        //if (i > 1)
+                        //{
+                        //    if (!string.IsNullOrWhiteSpace(result.Trim()))
+                        //    {
+                        //        //  Console.WriteLine(element.InnerText);
+                        //        nTexts.Add(element.InnerText);
+                        //    }
+                        //}
+                    }
+                    else
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                        i++;
+                        pageContentBuilder = new StringBuilder();
+                    }
+                    if (body.LastChild == element && pageContentBuilder.Length > 0)
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                    }
                 }
+
+                // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
+                foreach (var ntextItem in nTexts)
+                {
+                    // Console.WriteLine(ntextItem);
+                    if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
+                    {
+                        lstResult.Items.Add(ntextItem);
+                    }
+                }
+
             }
 
             return pageCount;
@@ -268,7 +271,7 @@ namespace ReadDoc
             return pageCount;
         }
 
-        private   int GetTextBySearch(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
+        private int GetTextBySearch(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
             StringBuilder sb = new StringBuilder();
             WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true);
@@ -292,7 +295,7 @@ namespace ReadDoc
                 {
                     ifCount++;
                     sb.AppendFormat(startCondition + DataExtractUtilities.ExtractConditionText(element, startCondition));
-                    lstResult.Items.Add( startCondition[0].ToString() + DataExtractUtilities.ExtractConditionText(element, startCondition));
+                    lstResult.Items.Add(startCondition[0].ToString() + DataExtractUtilities.ExtractConditionText(element, startCondition));
                 }
 
 
@@ -301,7 +304,7 @@ namespace ReadDoc
                 {
                     sb.Append(DataExtractUtilities.ExtractEndConditionText(element, endCondition) + endCondition);
                     ifCount = 0;
-                    lstResult.Items.Add(  sb.ToString());
+                    lstResult.Items.Add(sb.ToString());
                     //Console.WriteLine("*** 2. Condition Text --> " + element.InnerText);
                 }
                 //if (ifCount == 0)

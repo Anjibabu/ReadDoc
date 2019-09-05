@@ -133,7 +133,7 @@ namespace ReadDoc
         public static string RemoveTagsFromData(string inputData)
         {
             Regex rgx = new Regex(pattern);
-            return  rgx.Replace(inputData, "");
+            return rgx.Replace(inputData, "");
         }
 
         public static string GetTagData(string inputData)
@@ -151,23 +151,37 @@ namespace ReadDoc
             }
         }
 
-        public static string[] GetTagsListData(OpenXmlElement element)
+        public static string[] GetTagsData(string inputData, List<string> rItems)
         {
-            List<string> rItems = new List<string>();
+            Regex rgx = new Regex(pattern);
+
+            foreach (Match match in Regex.Matches(inputData, pattern))
+            {
+                rItems.Add(match.Groups[1].Value);
+            }
+
+            return rItems.ToArray();
+        }
+
+        public static string[] GetTagsListData(OpenXmlElement element, List<string> rItems)
+        {
             var childElements = element.ChildElements;
             foreach (var cElement in childElements)
             {
-                string rData = GetTagData(cElement.InnerText);
-                if (!string.IsNullOrWhiteSpace(rData))
+                if (cElement.HasChildren)
                 {
-                    rItems.Add(rData);
+                    GetTagsListData(cElement, rItems);
                 }
-                
+                else
+                {
+                    GetTagsData(cElement.InnerText, rItems);
+                }
+
             }
             return rItems.ToArray();
         }
 
-        public static bool IsMatchColor(OpenXmlElement element,string color)
+        public static bool IsMatchColor(OpenXmlElement element, string color)
         {
             bool isMatchColor = false;
             var childElements = element.ChildElements;
@@ -180,11 +194,11 @@ namespace ReadDoc
                         var localName = cElement.FirstChild.LocalName;
                         switch (localName)
                         {
-                           
+
                             case "rPr":
                                 if (((RunProperties)cElement.FirstChild).Highlight != null)
                                 {
-                                    if(((RunProperties)cElement.FirstChild).Highlight.Val== color)
+                                    if (((RunProperties)cElement.FirstChild).Highlight.Val == color)
                                     {
                                         isMatchColor = true;
                                     }
@@ -215,7 +229,7 @@ namespace ReadDoc
         public static string ExtractConditionText(OpenXmlElement element, String[] condition)
         {
             var innertext = element.InnerText;
-           return  innertext.Split(condition, StringSplitOptions.None)[1];
+            return innertext.Split(condition, StringSplitOptions.None)[1];
         }
 
         public static string ExtractEndConditionText(OpenXmlElement element, string[] condition)
