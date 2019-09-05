@@ -355,7 +355,7 @@ namespace ReadDoc
                     // Console.WriteLine(ntextItem);
                     if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
                     {
-                        lstResult.Items.Add(ntextItem);
+                        lstResult.Items.Add(ntextItem); 
                     }
                 }
             }
