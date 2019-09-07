@@ -79,6 +79,40 @@ namespace ReadDoc
             return normalText;
         }
 
+        public static List<string> GetNonStrikeTextWithOutTagsWithOutColor(OpenXmlElement element)
+        {
+            List<string> normalText = new List<string>();
+            var childElements = element.ChildElements;
+            foreach (var cElement in childElements)
+            {
+                if (cElement.FirstChild != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(cElement.InnerText))
+                    {
+                        var localName = cElement.FirstChild.LocalName;
+                        switch (localName)
+                        {
+                            case "t":
+                                //Console.WriteLine("*****" + cElement.InnerText + "*****");
+                                normalText.Add(cElement.InnerText);
+                                break;
+                            case "rPr":
+                                if (((RunProperties)cElement.FirstChild).Strike == null)
+                                {
+                                    string result = RemoveTagsFromData(cElement.InnerText);
+
+                                    normalText.Add(result);
+                                }
+                                break;
+                        }
+
+                    }
+                }
+            }
+
+            return normalText;
+        }
+
         public static List<string> GetNonStrikeTextWithTags(OpenXmlElement element)
         {
             List<string> normalText = new List<string>();
@@ -212,6 +246,81 @@ namespace ReadDoc
 
             return isMatchColor;
         }
+
+        public static bool IsTextHasColor(OpenXmlElement element)
+        {
+            bool isColor = false;
+            var childElements = element.ChildElements;
+            foreach (var cElement in childElements)
+            {
+                if (cElement.FirstChild != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(cElement.InnerText))
+                    {
+                        var localName = cElement.FirstChild.LocalName;
+                        switch (localName)
+                        {
+
+                            case "rPr":
+                                if (((RunProperties)cElement.FirstChild).Highlight != null)
+                                {
+                                    if (((RunProperties)cElement.FirstChild).Highlight.Val != null )
+                                    {
+                                        isColor = true;
+                                    }
+                                }
+                                break;
+                        }
+
+                    }
+                }
+            }
+
+            return isColor;
+        }
+
+        public static List<string> GetTextWithoutColor(OpenXmlElement element)
+        {
+            bool isColor = false;
+            List<string> text = new List<string>();
+            var childElements = element.ChildElements;
+            foreach (var cElement in childElements)
+            {
+                if (cElement.FirstChild != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(cElement.InnerText))
+                    {
+                        var localName = cElement.FirstChild.LocalName;
+                        switch (localName)
+                        {
+
+                            case "rPr":
+                                if (((RunProperties)cElement.FirstChild).Highlight != null)
+                                {
+                                    if (((RunProperties)cElement.FirstChild).Highlight.Val == null)
+                                    {
+                                        isColor = true;
+                                       
+                                    }
+                                }
+                                else
+                                {
+                                    if (((RunProperties)cElement.FirstChild).Strike == null)
+                                    {
+                                        text.Add(cElement.InnerText);
+                                    }
+                                   
+                                }
+                                break;
+                        }
+
+                    }
+                }
+            }
+
+            return text;
+        }
+
 
         public static bool IsMatchCondition(OpenXmlElement element, String[] condition)
         {

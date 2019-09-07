@@ -65,6 +65,9 @@ namespace ReadDoc
                     case "IF Condition":
                         pageCount = GetTextBySearch(nTexts, pageCount, pageviseContent, filepath);
                         break;
+                    case "Get Static Text":
+                        pageCount = ExtractDataFromDoc(nTexts, pageCount, pageviseContent, filepath);
+                        break;
                     default:
                         break;
                 }
@@ -82,7 +85,7 @@ namespace ReadDoc
         }
 
 
-        private int ExtractDataFRomDoc(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
+        private int ExtractDataFromDoc(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
             WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true);
             Body body = wordDocument.MainDocumentPart.Document.Body;
@@ -108,8 +111,20 @@ namespace ReadDoc
                     {
                         if (!string.IsNullOrWhiteSpace(result.Trim()))
                         {
+                            if (element.HasChildren)
+                            {
+                                nTexts.AddRange(DataExtractUtilities.GetTextWithoutColor(element));
+                            }
+                            else
+                            {
+                                if (!DataExtractUtilities.IsTextHasColor(element))
+                                {
+                                    nTexts.AddRange(DataExtractUtilities.GetNonStrikeTextWithOutTags(element));
+                                }
+                            }
                             //  Console.WriteLine(element.InnerText);
-                            nTexts.AddRange(DataExtractUtilities.GetNonStrikeTextWithOutTags(element));
+                           
+                            
                         }
                     }
                 }

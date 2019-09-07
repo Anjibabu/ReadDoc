@@ -70,7 +70,8 @@
             this.ddCondition.Items.AddRange(new object[] {
             "Get Text Between Tags ",
             "Get Text By Color",
-            "IF Condition"});
+            "IF Condition",
+            "Get Static Text"});
             this.ddCondition.Location = new System.Drawing.Point(363, 12);
             this.ddCondition.Name = "ddCondition";
             this.ddCondition.Size = new System.Drawing.Size(351, 24);
