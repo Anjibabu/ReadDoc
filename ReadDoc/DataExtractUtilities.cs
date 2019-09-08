@@ -355,6 +355,28 @@ namespace ReadDoc
             return text;
         }
 
+        public static string GetTextColor(OpenXmlElement element)
+        {
+            string color = "";
+
+            if (element.Parent.HasChildren)
+            {
+                foreach (OpenXmlElement citem in element.Parent.ChildElements)
+                {
+                    if (citem.HasChildren)
+                    {
+                        var highlightColorEle = citem.ChildElements.FirstOrDefault(a => a.LocalName == "highlight");
+                        if (highlightColorEle !=  null )
+                        {
+                            color = ((Highlight)highlightColorEle).Val.InnerText;
+                        }
+                    }
+                }
+            }
+
+            return color;
+        }
+
 
         public static bool IsMatchCondition(OpenXmlElement element, String[] condition)
         {
@@ -380,5 +402,7 @@ namespace ReadDoc
             var innertext = element.InnerText;
             return innertext.Split(condition, StringSplitOptions.None)[0];
         }
+
+
     }
 }

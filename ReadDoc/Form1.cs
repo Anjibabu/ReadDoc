@@ -60,8 +60,8 @@ namespace ReadDoc
                         pageCount = ExtractColorData(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     case "Get Text Between Tags":
-                        GetTagsData(nTexts, pageCount, pageviseContent, filepath);
-                       // ExtractTagsData(nTexts, pageCount, pageviseContent, filepath);
+                       // GetTagsData(nTexts, pageCount, pageviseContent, filepath);
+                         ExtractTagsData(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     case "IF Condition":
                         pageCount = GetTextBySearch(nTexts, pageCount, pageviseContent, filepath);
@@ -191,6 +191,8 @@ namespace ReadDoc
 
         private int ExtractTagsData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
+            string  StartTag = "<";
+            string  EndTag = ">";
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
             {
                 Body body = wordDocument.MainDocumentPart.Document.Body;
@@ -207,21 +209,8 @@ namespace ReadDoc
 
                     if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
                     {
-                        //pageContentBuilder.Append(element.InnerText );
                         // string result = DataExtractUtilities.GetTagData(element.InnerText);
-
-
                         cEles = DataExtractUtilities.GetAllChildElements(element);
-
-
-                        //if (i > 1)
-                        //{
-                        //    if (!string.IsNullOrWhiteSpace(result.Trim()))
-                        //    {
-                        //        //  Console.WriteLine(element.InnerText);
-                        //        nTexts.Add(element.InnerText);
-                        //    }
-                        //}
                     }
                     else
                     {
@@ -235,31 +224,70 @@ namespace ReadDoc
                     }
                 }
 
-
+                int startTagCount = 0;
+                string sb = "";
                 foreach (var elem in cEles)
                 {
                     List<string> rItems = new List<string>();
                     string resultData = elem.InnerText; //DataExtractUtilities.GetTagsData(elem);
+
+
                     if (!string.IsNullOrWhiteSpace(resultData))
                     {
-                        lstResult.Items.Add(resultData);
+                        if (IsTextField(elem) )
+                        {
+                            string color = DataExtractUtilities.GetTextColor(elem);
+                            if (color == "green")
+                            {
+                                if(resultData.IndexOf('<') != -1)
+                                {
+                                    startTagCount++;
+                                }
+                                if (resultData.IndexOf('>') != -1)
+                                {
+                                    sb += resultData;
+                                    startTagCount =0;
+                                }
+                                if(resultData.IndexOf('<') != -1 && resultData.IndexOf('>') != -1)
+                                {
+                                    sb = resultData;
+                                }
+                            
+                                if (startTagCount == 0)
+                                {
+                                    lstResult.Items.Add(sb);
+                                    sb = "";
+                                }
+                                else
+                                {
+                                    sb += resultData;
+                                }
+                                
+                            }
+                        }
+                       
                     }
-                }
-
-
-                // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
-                /* foreach (var ntextItem in nTexts)
-                 {
-                     // Console.WriteLine(ntextItem);
-                     if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
-                     {
-                         lstResult.Items.Add(ntextItem);
-                     }
-                 }*/
+                } 
 
             }
 
             return pageCount;
+        }
+
+         
+
+        private bool IsTextField(OpenXmlElement ele)
+        {
+            bool isText = false;
+            switch (ele.LocalName)
+            {
+                case "t":
+                    isText = true;
+                    break;
+                default:
+                    break;
+            }
+            return isText;
         }
 
         private int ExtractColorData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
