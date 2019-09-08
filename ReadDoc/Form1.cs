@@ -26,7 +26,7 @@ namespace ReadDoc
         private void DataBind()
         {
 
-            DirectoryInfo di = new DirectoryInfo(@"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents");
+            DirectoryInfo di = new DirectoryInfo(@"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\6letters");
             FileInfo[] files = di.GetFiles("*.docx");
             foreach (var item in files)
             {
@@ -41,7 +41,7 @@ namespace ReadDoc
             //{
             //Do whatever you want
             //openFileDialog1.FileName .....
-            DirectoryInfo di = new DirectoryInfo(@"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents");
+            DirectoryInfo di = new DirectoryInfo(@"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\6letters");
             string selectedFileName = comboBox1.SelectedItem.ToString();
 
             List<string> nTexts = new List<string>();
@@ -60,7 +60,8 @@ namespace ReadDoc
                         pageCount = ExtractColorData(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     case "Get Text Between Tags":
-                        pageCount = ExtractTagsData(nTexts, pageCount, pageviseContent, filepath);
+                        GetTagsData(nTexts, pageCount, pageviseContent, filepath);
+                       // ExtractTagsData(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     case "IF Condition":
                         pageCount = GetTextBySearch(nTexts, pageCount, pageviseContent, filepath);
@@ -123,8 +124,8 @@ namespace ReadDoc
                                 }
                             }
                             //  Console.WriteLine(element.InnerText);
-                           
-                            
+
+
                         }
                     }
                 }
@@ -167,7 +168,25 @@ namespace ReadDoc
             return pageCount;
         }
 
+        private void GetTagsData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
+        {
+            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
+            {
+                Body body = wordDocument.MainDocumentPart.Document.Body;
+                List<string> s1 = body.InnerText.Split('<').ToList();
 
+                int i = 0;
+                foreach (var item in s1)
+                {
+                    if (i > 0)
+                    {
+                        string f1 = item.Split('>')[0];
+                        lstResult.Items.Add(f1);
+                    }
+                    i++;
+                }
+            }
+        }
 
 
         private int ExtractTagsData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
@@ -182,6 +201,7 @@ namespace ReadDoc
                 int i = 1;
 
                 StringBuilder pageContentBuilder = new StringBuilder();
+                List<OpenXmlElement> cEles = new List<OpenXmlElement>();
                 foreach (OpenXmlElement element in body.ChildElements)
                 {
 
@@ -189,10 +209,11 @@ namespace ReadDoc
                     {
                         //pageContentBuilder.Append(element.InnerText );
                         // string result = DataExtractUtilities.GetTagData(element.InnerText);
-                        List<string> rItems = new List<string>();
-                        string[] resultData = DataExtractUtilities.GetTagsListData(element, rItems);
 
-                        nTexts.AddRange(resultData);
+
+                        cEles = DataExtractUtilities.GetAllChildElements(element);
+
+
                         //if (i > 1)
                         //{
                         //    if (!string.IsNullOrWhiteSpace(result.Trim()))
@@ -214,15 +235,27 @@ namespace ReadDoc
                     }
                 }
 
-                // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
-                foreach (var ntextItem in nTexts)
+
+                foreach (var elem in cEles)
                 {
-                    // Console.WriteLine(ntextItem);
-                    if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
+                    List<string> rItems = new List<string>();
+                    string resultData = elem.InnerText; //DataExtractUtilities.GetTagsData(elem);
+                    if (!string.IsNullOrWhiteSpace(resultData))
                     {
-                        lstResult.Items.Add(ntextItem);
+                        lstResult.Items.Add(resultData);
                     }
                 }
+
+
+                // Console.WriteLine("pageContentBuilder=", pageContentBuilder.ToString());
+                /* foreach (var ntextItem in nTexts)
+                 {
+                     // Console.WriteLine(ntextItem);
+                     if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
+                     {
+                         lstResult.Items.Add(ntextItem);
+                     }
+                 }*/
 
             }
 
@@ -370,7 +403,7 @@ namespace ReadDoc
                     // Console.WriteLine(ntextItem);
                     if (ntextItem.Trim() != "," && ntextItem.Trim() != "." && ntextItem.Trim() != ":" && ntextItem.Trim() != "")
                     {
-                        lstResult.Items.Add(ntextItem); 
+                        lstResult.Items.Add(ntextItem);
                     }
                 }
             }

@@ -46,12 +46,11 @@
             // 
             // lstResult
             // 
-            this.lstResult.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lstResult.FormattingEnabled = true;
             this.lstResult.ItemHeight = 16;
-            this.lstResult.Location = new System.Drawing.Point(0, 53);
+            this.lstResult.Location = new System.Drawing.Point(12, 81);
             this.lstResult.Name = "lstResult";
-            this.lstResult.Size = new System.Drawing.Size(1513, 612);
+            this.lstResult.Size = new System.Drawing.Size(1319, 724);
             this.lstResult.TabIndex = 4;
             // 
             // comboBox1
@@ -81,7 +80,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1513, 665);
+            this.ClientSize = new System.Drawing.Size(1513, 809);
             this.Controls.Add(this.ddCondition);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.lstResult);

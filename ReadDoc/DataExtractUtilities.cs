@@ -197,6 +197,21 @@ namespace ReadDoc
             return rItems.ToArray();
         }
 
+        public static string  GetTagsData(OpenXmlElement element )
+        {
+            var inputData = element.InnerText;
+            Regex rgx = new Regex(pattern);
+
+            if (rgx.IsMatch(inputData))
+            {
+                //Console.WriteLine("Tagas Data-->" + inputData);
+                return inputData;
+            }
+            else
+            {
+                return "";
+            }
+        }
         public static string[] GetTagsListData(OpenXmlElement element, List<string> rItems)
         {
             var childElements = element.ChildElements;
@@ -213,6 +228,25 @@ namespace ReadDoc
 
             }
             return rItems.ToArray();
+        }
+
+        static List<OpenXmlElement> cElements = new List<OpenXmlElement>();
+        public static List<OpenXmlElement> GetAllChildElements(OpenXmlElement element)
+        {
+            var childElements = element.ChildElements;
+            foreach (var cElement in childElements)
+            {
+                if (cElement.HasChildren)
+                {
+                    GetAllChildElements(cElement);
+                }
+                else
+                {
+                    cElements.Add(cElement);
+                }
+
+            }
+            return cElements;
         }
 
         public static bool IsMatchColor(OpenXmlElement element, string color)
