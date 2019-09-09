@@ -22,7 +22,7 @@ namespace ReadDoc
             DataBind();
         }
 
-
+        static List<OpenXmlElement> cElements = new List<OpenXmlElement>();
         private void DataBind()
         {
 
@@ -45,7 +45,7 @@ namespace ReadDoc
             string selectedFileName = comboBox1.SelectedItem.ToString();
 
             List<string> nTexts = new List<string>();
-
+            cElements.Clear();
             lstResult.Items.Clear();
             int pageCount = 0;
             Dictionary<int, string> pageviseContent = new Dictionary<int, string>();
@@ -191,6 +191,7 @@ namespace ReadDoc
 
         private int ExtractTagsData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
+            lstResult.Items.Clear();
             string  StartTag = "<";
             string  EndTag = ">";
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
@@ -210,7 +211,7 @@ namespace ReadDoc
                     if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
                     {
                         // string result = DataExtractUtilities.GetTagData(element.InnerText);
-                        cEles = DataExtractUtilities.GetAllChildElements(element);
+                        cEles = DataExtractUtilities.GetAllChildElements(element, cElements);
                     }
                     else
                     {
@@ -237,7 +238,8 @@ namespace ReadDoc
                         if (IsTextField(elem) )
                         {
                             string color = DataExtractUtilities.GetTextColor(elem);
-                            if (color == "green")
+                            bool IsTextStrike = DataExtractUtilities.IsTextStrike(elem);
+                            if (color == "green" && !IsTextStrike)
                             {
                                 if(resultData.IndexOf('<') != -1)
                                 {

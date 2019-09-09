@@ -230,15 +230,15 @@ namespace ReadDoc
             return rItems.ToArray();
         }
 
-        static List<OpenXmlElement> cElements = new List<OpenXmlElement>();
-        public static List<OpenXmlElement> GetAllChildElements(OpenXmlElement element)
+        
+        public static List<OpenXmlElement> GetAllChildElements(OpenXmlElement element,List<OpenXmlElement> cElements)
         {
             var childElements = element.ChildElements;
             foreach (var cElement in childElements)
             {
                 if (cElement.HasChildren)
                 {
-                    GetAllChildElements(cElement);
+                    GetAllChildElements(cElement, cElements);
                 }
                 else
                 {
@@ -375,6 +375,28 @@ namespace ReadDoc
             }
 
             return color;
+        }
+
+        public static bool IsTextStrike(OpenXmlElement element)
+        {
+            bool isTextStrike = false;
+
+            if (element.Parent.HasChildren)
+            {
+                foreach (OpenXmlElement citem in element.Parent.ChildElements)
+                {
+                    if (citem.HasChildren)
+                    {
+                        var strikeEle = citem.ChildElements.FirstOrDefault(a => a.LocalName == "strike");
+                        if (strikeEle != null)
+                        {
+                            isTextStrike = true;
+                        }
+                    }
+                }
+            }
+
+            return isTextStrike;
         }
 
 
