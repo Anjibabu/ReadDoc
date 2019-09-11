@@ -23,10 +23,13 @@ namespace ReadDoc
         }
 
         static List<OpenXmlElement> cElements = new List<OpenXmlElement>();
+
+        string folderPath = @"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\6letters";
+
         private void DataBind()
         {
 
-            DirectoryInfo di = new DirectoryInfo(@"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\6letters");
+            DirectoryInfo di = new DirectoryInfo(folderPath);
             FileInfo[] files = di.GetFiles("*.docx");
             foreach (var item in files)
             {
@@ -41,7 +44,7 @@ namespace ReadDoc
             //{
             //Do whatever you want
             //openFileDialog1.FileName .....
-            DirectoryInfo di = new DirectoryInfo(@"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\6letters");
+            DirectoryInfo di = new DirectoryInfo(folderPath);
             string selectedFileName = comboBox1.SelectedItem.ToString();
 
             List<string> nTexts = new List<string>();
@@ -67,7 +70,7 @@ namespace ReadDoc
                         pageCount = GetTextBySearch(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     case "Get Static Text":
-                        pageCount = ExtractDataFromDoc(nTexts, pageCount, pageviseContent, filepath);
+                        pageCount = ExtractDataFromDoc_V1(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     default:
                         break;
@@ -160,6 +163,94 @@ namespace ReadDoc
                         {
                             lstResult.Items.Add(ntextItem);
                         }
+                    }
+                }
+
+            }
+
+            return pageCount;
+        }
+
+        private int ExtractDataFromDoc_V1(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
+        {
+            lstResult.Items.Clear();
+            string StartTag = "<";
+            string EndTag = ">";
+            using (WordprocessingDocument wordDocument = WordprocessingDocument.Open(filepath, true))
+            {
+                Body body = wordDocument.MainDocumentPart.Document.Body;
+                if (wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text != null)
+                {
+                    pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
+                }
+                int i = 1;
+
+                StringBuilder pageContentBuilder = new StringBuilder();
+                List<OpenXmlElement> cEles = new List<OpenXmlElement>();
+                foreach (OpenXmlElement element in body.ChildElements)
+                {
+
+                    if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        // string result = DataExtractUtilities.GetTagData(element.InnerText);
+                        cEles = DataExtractUtilities.GetAllChildElements(element, cElements);
+                    }
+                    else
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                        i++;
+                        pageContentBuilder = new StringBuilder();
+                    }
+                    if (body.LastChild == element && pageContentBuilder.Length > 0)
+                    {
+                        pageviseContent.Add(i, pageContentBuilder.ToString());
+                    }
+                }
+
+                int startTagCount = 0;
+                string sb = "";
+                foreach (var elem in cEles)
+                {
+                    List<string> rItems = new List<string>();
+                    string resultData = elem.InnerText; //DataExtractUtilities.GetTagsData(elem);
+
+
+                    if (!string.IsNullOrWhiteSpace(resultData))
+                    {
+                        if (IsTextField(elem))
+                        {
+                            string color = DataExtractUtilities.GetTextColor(elem);
+                            bool IsTextStrike = DataExtractUtilities.IsTextStrike(elem);
+                            if (string.IsNullOrWhiteSpace(color)  && !IsTextStrike)
+                            {
+                                lstResult.Items.Add(elem.InnerText);
+                                /*if (resultData.IndexOf('<') != -1)
+                                {
+                                    startTagCount++;
+                                }
+                                if (resultData.IndexOf('>') != -1)
+                                {
+                                    sb += resultData;
+                                    startTagCount = 0;
+                                }
+                                if (resultData.IndexOf('<') != -1 && resultData.IndexOf('>') != -1)
+                                {
+                                    sb = resultData;
+                                }
+
+                                if (startTagCount == 0)
+                                {
+                                    lstResult.Items.Add(sb);
+                                    sb = "";
+                                }
+                                else
+                                {
+                                    sb += resultData;
+                                }
+                                */
+                            }
+                        }
+
                     }
                 }
 
