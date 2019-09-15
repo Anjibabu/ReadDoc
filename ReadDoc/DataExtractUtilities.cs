@@ -8,6 +8,10 @@ using Paragraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
 using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.IO;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
 
 namespace ReadDoc
 {
@@ -425,6 +429,6 @@ namespace ReadDoc
             return innertext.Split(condition, StringSplitOptions.None)[0];
         }
 
-
+       
     }
 }

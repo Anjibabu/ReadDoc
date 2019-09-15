@@ -25,6 +25,7 @@ namespace ReadDoc
         static List<OpenXmlElement> cElements = new List<OpenXmlElement>();
 
         string folderPath = @"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\6letters";
+        string pdffolderPath = @"C:\Users\akari\Downloads\RedPDF\ReadDoc\Documents\dest";
 
         private void DataBind()
         {
@@ -36,6 +37,13 @@ namespace ReadDoc
                 comboBox1.Items.Add(item.Name);
             }
 
+            DirectoryInfo di1 = new DirectoryInfo(pdffolderPath);
+            FileInfo[] files1 = di.GetFiles("*.pdf");
+            foreach (var item1 in files1)
+            {
+                ddDest.Items.Add(item1.Name);
+            }
+
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -45,6 +53,7 @@ namespace ReadDoc
             //Do whatever you want
             //openFileDialog1.FileName .....
             DirectoryInfo di = new DirectoryInfo(folderPath);
+            DirectoryInfo di1 = new DirectoryInfo(pdffolderPath);
             string selectedFileName = comboBox1.SelectedItem.ToString();
 
             List<string> nTexts = new List<string>();
@@ -70,7 +79,17 @@ namespace ReadDoc
                         pageCount = GetTextBySearch(nTexts, pageCount, pageviseContent, filepath);
                         break;
                     case "Get Static Text":
-                        pageCount = ExtractDataFromDoc_V1(nTexts, pageCount, pageviseContent, filepath);
+                      var  ldata = ExtractDataFromDoc_V1(nTexts, pageCount, pageviseContent, filepath);
+                        var pdfFilepath = System.IO.Path.Combine(di1.FullName, ddDest.SelectedItem.ToString());
+                        string pdfText = PdfExtract.ReadPDFFile(pdfFilepath);
+                        foreach (var item in ldata)
+                        {
+                            string ss = item.Text;//.Replace('.',' ');
+                          var ddd=  PdfExtract.CheckTextInFile(pdfText, ss);
+                            lstResult.Items.Add("Text:-" + item.Text + " result:- " + ddd.ToString());
+                        }
+                      
+
                         break;
                     default:
                         break;
@@ -83,10 +102,9 @@ namespace ReadDoc
                 lstResult.Items.Add("Error While Extracting data   " + ex.Message);
             }
 
-
-
             //  }
         }
+
 
 
         private int ExtractDataFromDoc(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
@@ -171,8 +189,9 @@ namespace ReadDoc
             return pageCount;
         }
 
-        private int ExtractDataFromDoc_V1(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
+        private List<ExtractText> ExtractDataFromDoc_V1(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
         {
+            List<ExtractText> result = new List<ExtractText>();
             lstResult.Items.Clear();
             string StartTag = "<";
             string EndTag = ">";
@@ -183,28 +202,25 @@ namespace ReadDoc
                 {
                     pageCount = Convert.ToInt32(wordDocument.ExtendedFilePropertiesPart.Properties.Pages.Text);
                 }
-                int i = 1;
+                int i = 0;
 
                 StringBuilder pageContentBuilder = new StringBuilder();
                 List<OpenXmlElement> cEles = new List<OpenXmlElement>();
                 foreach (OpenXmlElement element in body.ChildElements)
                 {
 
-                    if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) < 0)
+                    if (element.InnerXml.IndexOf("<w:br w:type=\"page\" />", StringComparison.OrdinalIgnoreCase) > 0)
                     {
+                        i =1;
                         // string result = DataExtractUtilities.GetTagData(element.InnerText);
+                       // cEles = DataExtractUtilities.GetAllChildElements(element, cElements);
+                    }
+                    
+                    if (i == 1)
+                    {
                         cEles = DataExtractUtilities.GetAllChildElements(element, cElements);
                     }
-                    else
-                    {
-                        pageviseContent.Add(i, pageContentBuilder.ToString());
-                        i++;
-                        pageContentBuilder = new StringBuilder();
-                    }
-                    if (body.LastChild == element && pageContentBuilder.Length > 0)
-                    {
-                        pageviseContent.Add(i, pageContentBuilder.ToString());
-                    }
+                    
                 }
 
                 int startTagCount = 0;
@@ -223,31 +239,14 @@ namespace ReadDoc
                             bool IsTextStrike = DataExtractUtilities.IsTextStrike(elem);
                             if (string.IsNullOrWhiteSpace(color)  && !IsTextStrike)
                             {
-                                lstResult.Items.Add(elem.InnerText);
-                                /*if (resultData.IndexOf('<') != -1)
+                                //lstResult.Items.Add(elem.InnerText);
+                                result.Add(new ExtractText()
                                 {
-                                    startTagCount++;
-                                }
-                                if (resultData.IndexOf('>') != -1)
-                                {
-                                    sb += resultData;
-                                    startTagCount = 0;
-                                }
-                                if (resultData.IndexOf('<') != -1 && resultData.IndexOf('>') != -1)
-                                {
-                                    sb = resultData;
-                                }
+                                    Text = elem.InnerText,
+                                    Type = ExtractType.Text.ToString()
+                                });
 
-                                if (startTagCount == 0)
-                                {
-                                    lstResult.Items.Add(sb);
-                                    sb = "";
-                                }
-                                else
-                                {
-                                    sb += resultData;
-                                }
-                                */
+
                             }
                         }
 
@@ -256,7 +255,7 @@ namespace ReadDoc
 
             }
 
-            return pageCount;
+            return result;
         }
 
         private void GetTagsData(List<string> nTexts, int pageCount, Dictionary<int, string> pageviseContent, string filepath)
@@ -540,5 +539,17 @@ namespace ReadDoc
         {
 
         }
+    }
+
+    public class ExtractText
+    {
+        public string Text { get; set; }
+        public string Type { get; set; }
+    }
+    public enum ExtractType
+    {
+        Text,
+        Tag,
+        condition
     }
 }

@@ -32,11 +32,12 @@
             this.lstResult = new System.Windows.Forms.ListBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.ddCondition = new System.Windows.Forms.ComboBox();
+            this.ddDest = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(758, 12);
+            this.button1.Location = new System.Drawing.Point(916, 18);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(93, 35);
             this.button1.TabIndex = 1;
@@ -50,7 +51,7 @@
             this.lstResult.ItemHeight = 16;
             this.lstResult.Location = new System.Drawing.Point(12, 81);
             this.lstResult.Name = "lstResult";
-            this.lstResult.Size = new System.Drawing.Size(1319, 724);
+            this.lstResult.Size = new System.Drawing.Size(1657, 724);
             this.lstResult.TabIndex = 4;
             // 
             // comboBox1
@@ -71,16 +72,27 @@
             "Get Text By Color",
             "IF Condition",
             "Get Static Text"});
-            this.ddCondition.Location = new System.Drawing.Point(363, 12);
+            this.ddCondition.Location = new System.Drawing.Point(621, 18);
             this.ddCondition.Name = "ddCondition";
-            this.ddCondition.Size = new System.Drawing.Size(351, 24);
+            this.ddCondition.Size = new System.Drawing.Size(237, 24);
             this.ddCondition.TabIndex = 6;
+            // 
+            // ddDest
+            // 
+            this.ddDest.FormattingEnabled = true;
+            this.ddDest.Items.AddRange(new object[] {
+            "3436995.pdf"});
+            this.ddDest.Location = new System.Drawing.Point(372, 10);
+            this.ddDest.Name = "ddDest";
+            this.ddDest.Size = new System.Drawing.Size(121, 24);
+            this.ddDest.TabIndex = 7;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1513, 809);
+            this.ClientSize = new System.Drawing.Size(1706, 809);
+            this.Controls.Add(this.ddDest);
             this.Controls.Add(this.ddCondition);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.lstResult);
@@ -97,6 +109,7 @@
         private System.Windows.Forms.ListBox lstResult;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox ddCondition;
+        private System.Windows.Forms.ComboBox ddDest;
     }
 }
 
