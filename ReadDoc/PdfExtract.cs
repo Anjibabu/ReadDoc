@@ -42,7 +42,8 @@ namespace ReadDoc
 
         public static bool CheckTextInFile(string pdfContent,string vText)
         {
-            return pdfContent.Contains(vText.Trim());
+            string newPdfCOntent = pdfContent.Replace("  ", " ");
+            return newPdfCOntent.Contains(vText.Trim().Replace("  ", " "));
         }
 
     }
