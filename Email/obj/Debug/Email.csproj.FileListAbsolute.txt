@@ -1,0 +1,6 @@
+E:\Personal\Work\ReadDoc\ReadDoc\Email\bin\Debug\Email.dll.config
+E:\Personal\Work\ReadDoc\ReadDoc\Email\bin\Debug\Email.dll
+E:\Personal\Work\ReadDoc\ReadDoc\Email\bin\Debug\Email.pdb
+E:\Personal\Work\ReadDoc\ReadDoc\Email\obj\Debug\Email.csproj.CoreCompileInputs.cache
+E:\Personal\Work\ReadDoc\ReadDoc\Email\obj\Debug\Email.dll
+E:\Personal\Work\ReadDoc\ReadDoc\Email\obj\Debug\Email.pdb

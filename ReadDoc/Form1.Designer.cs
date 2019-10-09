@@ -33,6 +33,8 @@
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.ddCondition = new System.Windows.Forms.ComboBox();
             this.ddDest = new System.Windows.Forms.ComboBox();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -72,26 +74,47 @@
             "Get Text By Color",
             "IF Condition",
             "Get Static Text"});
-            this.ddCondition.Location = new System.Drawing.Point(621, 18);
+            this.ddCondition.Location = new System.Drawing.Point(472, 10);
             this.ddCondition.Name = "ddCondition";
-            this.ddCondition.Size = new System.Drawing.Size(237, 24);
+            this.ddCondition.Size = new System.Drawing.Size(197, 24);
             this.ddCondition.TabIndex = 6;
             // 
             // ddDest
             // 
             this.ddDest.FormattingEnabled = true;
-            this.ddDest.Items.AddRange(new object[] {
-            "3436995.pdf"});
-            this.ddDest.Location = new System.Drawing.Point(372, 10);
+            this.ddDest.Location = new System.Drawing.Point(332, 10);
             this.ddDest.Name = "ddDest";
             this.ddDest.Size = new System.Drawing.Size(121, 24);
             this.ddDest.TabIndex = 7;
+            // 
+            // comboBox2
+            // 
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Items.AddRange(new object[] {
+            "MAPD",
+            "HMO"});
+            this.comboBox2.Location = new System.Drawing.Point(689, 10);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(121, 24);
+            this.comboBox2.TabIndex = 8;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(1112, 29);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 9;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1706, 809);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.ddDest);
             this.Controls.Add(this.ddCondition);
             this.Controls.Add(this.comboBox1);
@@ -110,6 +133,8 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox ddCondition;
         private System.Windows.Forms.ComboBox ddDest;
+        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.Button button2;
     }
 }
 

@@ -30,3 +30,6 @@ E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\obj\Debug\ReadDoc.exe
 E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\obj\Debug\ReadDoc.pdb
 E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\bin\Debug\itextsharp.dll
 E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\bin\Debug\itextsharp.xml
+E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\bin\Debug\Email.dll
+E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\bin\Debug\Email.pdb
+E:\Personal\Work\ReadDoc\ReadDoc\ReadDoc\bin\Debug\Email.dll.config

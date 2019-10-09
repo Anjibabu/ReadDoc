@@ -1,6 +1,9 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Email;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,7 +41,8 @@ namespace ReadDoc
             }
 
             DirectoryInfo di1 = new DirectoryInfo(pdffolderPath);
-            FileInfo[] files1 = di.GetFiles("*.pdf");
+            FileInfo[] files1 = di1.GetFiles("*.pdf");
+            ddDest.Items.Clear();
             foreach (var item1 in files1)
             {
                 ddDest.Items.Add(item1.Name);
@@ -458,7 +462,7 @@ namespace ReadDoc
                 {
                     Console.WriteLine("***InnerText  --> " + element.InnerText);
 
-                    String[] startCondition = new String[] { "[IF " };
+                    String[] startCondition = new String[] { "[IF BUSINESSTYPE = ‘MAPD’" };
                     String[] endCondition = new String[] { " END IF]" };
                     var isMatchCondition = DataExtractUtilities.IsMatchCondition(element, startCondition);
                     if (isMatchCondition)
@@ -538,6 +542,36 @@ namespace ReadDoc
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string basepath = Class1.GetBasePath();
+
+            string selectedPdfFileName = ddDest.SelectedItem.ToString();
+            string pdfFile = System.IO.Path.Combine(pdffolderPath, selectedPdfFileName);
+            ExtractTextFromPdf(pdfFile);
+        }
+        public static string ExtractTextFromPdf(string path)
+        {
+            //            ITextExtractionStrategy its = new iTextSharp.text.pdf.parser.LocationTextExtractionStrategy();
+            ITextExtractionStrategy its = new iTextSharp.text.pdf.parser.SimpleTextExtractionStrategy();
+
+            using (PdfReader reader = new PdfReader(path))
+            {
+                StringBuilder text = new StringBuilder();
+
+                for (int i = 1; i <= reader.NumberOfPages; i++)
+                {
+                    string thePage = PdfTextExtractor.GetTextFromPage(reader, i, its);
+                    string[] theLines = thePage.Split('\n');
+                    foreach (var theLine in theLines)
+                    {
+                        text.Append(" "+theLine);
+                    }
+                }
+                return text.ToString();
+            }
         }
     }
 
